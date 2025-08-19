@@ -1,2 +1,2 @@
 [tool.poetry.scripts]
-grace = "grace_client.cli:main"
+grace = "grace_query.cli:main"
