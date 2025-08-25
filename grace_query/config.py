@@ -2,6 +2,25 @@
 from dataclasses import dataclass
 from datetime import datetime
 import yaml
+from dotenv import load_dotenv
+import os               # Library for system operations, like reading environment variables
+
+# Load environment variables
+load_dotenv()
+
+def showenv():
+  f = open('.env','r')
+  env_list=list(filter(None,[ s.split('=')[0].split('#')[0] for s in f.read().split('\n')]))
+  f.close()
+  print('Loaded the following env vars from .env:')
+  for f in env_list:
+      print(f'{f} = {os.getenv(f)}')
+
+def getenv(name: str) -> str:
+  value = os.getenv(name)
+  if not value:
+      raise EnvironmentError("{name} not found in environment variables.")
+  return value
 
 @dataclass
 class TimeCfg:  start:str|None=None; end:str|None=None
@@ -29,7 +48,7 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
     space_dict = cfg.get("space",{})
     space = SpaceCfg(
         bbox=[float(x) for x in args.bbox] if args.bbox else space_dict.get("bbox"),
-        polygon_str=args.polygon or space_dict.get("polygon_str"),
+        polygon_str=args.polygon_str or space_dict.get("polygon_str"),
         polygon_file=args.polygon_file or space_dict.get("polygon_file"),
         polygon_crs=args.polygon_crs or space_dict.get("polygon_crs","EPSG:4326")
     )
@@ -39,7 +58,7 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
         format=(args.out_format or export_dict.get("format","netcdf")),
         out=(args.out_path or export_dict.get("path","./query_output.nc")),
         strict_cf=bool(args.strict_cf or export_dict.get("strict_cf",False)),
-        options=export_dict.get("netcdf",{}) if (args.format or export_dict.get("format","netcdf"))=="netcdf" else {}
+        options=export_dict.get("netcdf",{}) if (args.out_format or export_dict.get("format","netcdf"))=="netcdf" else {}
     )
     
     

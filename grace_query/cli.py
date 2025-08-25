@@ -1,27 +1,31 @@
 # grace_query/cli.py
 import argparse, os, sys
-from .config import load_config, merge_cli_over_config
+from .config import getenv, load_config, merge_cli_over_config
 from .polygons import parse_space  # returns dict with {'wkt': 'POLYGON(...)', 'srid': 4326} or None
 from .sql import run_query         # returns pandas DataFrame
 from .problematic import diagnose, ProblematicConfig
 from .export import select_writer  # returns a writer with .write(df, out_path)
 
 def main():
-    parser = argparse.ArgumentParser(prog="grace query", description="Query KBR Gravimetry Data within polygon and time bounds.")
-    parser.add_argument("--config")
-    parser.add_argument("--start_time", type=str, help="Start time (e.g. '2017-01-01T00:00:00')")
-    parser.add_argument("--end_time", type=str, help="End time (e.g. '2017-02-01T00:00:00')")
-    parser.add_argument("--bbox", nargs=4, type=float)
-    parser.add_argument("--polygon-str", type=str, help="Polygon coordinates as 'lon1 lat1,lon2 lat2,...,lonN latN'")
-    parser.add_argument("--polygon-file")
-    parser.add_argument("--polygon-crs", default="EPSG:4326")
-    parser.add_argument("--params")
-    parser.add_argument("--out_format", type=str, default="netcdf", choices=["netcdf","csv","parquet"], help="Output format (csv or netcdf)")
-    parser.add_argument("--out_path")
-    parser.add_argument("--problematic-report")
-    parser.add_argument("--strict-cf", action="store_true")
-    parser.add_argument("--db-url")                # optional override
-    parser.add_argument("--table")                 # optional override
+    parser = argparse.ArgumentParser(prog="grace query", description="GRACE CLI Query Tool")
+    subparsers = parser.add_subparsers(dest="command")
+
+    query_parser = subparsers.add_parser("query", help="Query KBR Gravimetry Data within polygon and time bounds.")
+    query_parser.add_argument("--config")
+    query_parser.add_argument("--start_time", type=str, help="Start time (e.g. '2017-01-01T00:00:00')")
+    query_parser.add_argument("--end_time", type=str, help="End time (e.g. '2017-02-01T00:00:00')")
+    query_parser.add_argument("--bbox", nargs=4, type=float)
+    query_parser.add_argument("--polygon-str", type=str, help="Polygon coordinates as 'lon1 lat1,lon2 lat2,...,lonN latN'")
+    query_parser.add_argument("--polygon-file")
+    query_parser.add_argument("--polygon-crs", default="EPSG:4326")
+    query_parser.add_argument("--params")
+    query_parser.add_argument("--out_format", type=str, default="netcdf", choices=["netcdf","csv","parquet"], help="Output format (csv or netcdf)")
+    query_parser.add_argument("--out_path")
+    query_parser.add_argument("--problematic-report")
+    query_parser.add_argument("--strict-cf", action="store_true")
+    query_parser.add_argument("--db-url")                # optional override
+    query_parser.add_argument("--table")                 # optional override
+
     args = parser.parse_args()
 
     cfg = load_config(args.config)
@@ -35,9 +39,9 @@ def main():
         target_srid=cfg.backend.srid
     )
     df = run_query(
-        db_url=cfg.backend.url or os.getenv("DATABASE_URL"),
-        table=cfg.backend.table or os.getenv("TABLE_NAME"),
-        start_time=cfg.time.start, end_time=cfg.time.end,
+        db_url=cfg.backend.url or getenv("DATABASE_URL"),
+        table=cfg.backend.table or getenv("TABLE_NAME"),
+        start=cfg.time.start, end=cfg.time.end,
         space=space, columns=cfg.columns
     )
 

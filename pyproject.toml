@@ -1,2 +1,36 @@
+[tool.poetry]
+name = "grace_query"
+version = "0.1.0"
+description = "CLI Query Tool for Time and Space"
+authors = ["Joao Guimaraes <j.guimaraes@tudelft.nl>", "Jose Urra <j.c.urrallanusa@tudelft.nl>", "Selin Kubilay <d.s.kubilay@tudelft.nl>"]
+license = "MIT"
+
 [tool.poetry.scripts]
 grace = "grace_query.cli:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+sqlalchemy = "^2.0.25"
+alembic = "^1.12.1"
+psycopg2 = "^2.9.10"
+geoalchemy2 = "^0.14.1"
+geopandas = "^0.14.2"
+shapely = "^2.0.2"
+uvicorn = "^0.27.0"
+python-dotenv = "^1.1.0"
+pandas = "^2.2.0"
+h11 = "^0.16.0"
+xarray = "^2025.4.0"
+netcdf4 = "^1.7.2"
+PyYAML = "^6.0.2"
+tqdm = "^4.67.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
+pytest = "^7.4.3"
+flake8 = "^7.0.0"
+alembic = "^1.16.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -18,7 +18,7 @@ def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs="EPS
 
     elif polygon_str:
         pairs = [p.strip() for p in polygon_str.split(",")]
-        coords = [(float(x), float(y)) for x, y in pairs.split()]
+        coords = [(float(x), float(y)) for x, y in (pair.split() for pair in pairs)]
         poly = Polygon(_close_ring(coords))
 
     else:  # polygon_file (GeoJSON or WKT in a .wkt)
