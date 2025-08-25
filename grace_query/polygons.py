@@ -1,4 +1,4 @@
-# grace_client/polygons.py
+# grace_query/polygons.py
 from typing import Optional, Dict
 from shapely.geometry import Polygon, shape
 from shapely import wkt as shapely_wkt

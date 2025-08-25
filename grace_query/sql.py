@@ -1,4 +1,4 @@
-# grace_client/sql.py
+# grace_query/sql.py
 import pandas as pd
 from sqlalchemy import create_engine, text
 

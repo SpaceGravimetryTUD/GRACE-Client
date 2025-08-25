@@ -1,4 +1,4 @@
-# grace_client/config.py
+# grace_query/config.py
 from dataclasses import dataclass
 from datetime import datetime
 import yaml
@@ -46,14 +46,14 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
     prob_dict = cfg.get("problematic_months")
     problematic = None
 
-    '''
+    
     if prob_dict or args.problematic_report:
         problematic = ProbleCfg(
             cadence_seconds=int((prob_dict or {}).get("cadence_seconds",5)),
             missing_threshold_pct=float((prob_dict or {}).get("missing_threshold_pct",2.0)),
             report_path=args.problematic_report or (prob_dict or {}).get("report_path")
         )
-    '''
+        
     
     backend_dict = cfg.get("backend",{})
     backend = Backend(
