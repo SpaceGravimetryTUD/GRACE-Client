@@ -8,19 +8,22 @@ import os               # Library for system operations, like reading environmen
 # Load environment variables
 load_dotenv()
 
-def showenv():
-  f = open('.env','r')
-  env_list=list(filter(None,[ s.split('=')[0].split('#')[0] for s in f.read().split('\n')]))
-  f.close()
+def getenv_list() -> list:
+    f = open('.env','r')
+    env_list=list(filter(None,[ s.split('=')[0].split('#')[0] for s in f.read().split('\n')]))
+    f.close()
+    return env_list
+
+def showenv(env_list: list = getenv_list()):
   print('Loaded the following env vars from .env:')
   for f in env_list:
       print(f'{f} = {os.getenv(f)}')
 
-def getenv(name: str) -> str:
-  value = os.getenv(name)
-  if not value:
+def getenv(envname: str) -> str:
+  envvar = os.getenv(envname)
+  if not envvar:
       raise EnvironmentError("{name} not found in environment variables.")
-  return value
+  return envvar
 
 @dataclass
 class TimeCfg:  start:str|None=None; end:str|None=None
