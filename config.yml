@@ -6,6 +6,10 @@ space:
   polygon_str: '130 -10,240 -10,240 10,130 10,130 -10'
   polygon_file: null
   polygon_crs: "EPSG:4326"
+problematic_months:
+  cadence_seconds: null
+  missing_threshold_pct: null
+  report_path: null
 export:
   format: csv
   path: "./query_output.csv"
