@@ -38,6 +38,7 @@ def main():
         polygon_crs=cfg.space.polygon_crs,
         target_srid=cfg.backend.srid
     )
+    
     df = run_query(
         db_url=cfg.backend.url or getenv("DATABASE_URL"),
         table=cfg.backend.table or getenv("TABLE_NAME"),

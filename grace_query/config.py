@@ -41,7 +41,10 @@ class Cfg:
 
 def load_config(path:str|None)->dict:
     if not path: return {}
-    with open(path) as f: return yaml.safe_load(f) or {}
+    try:
+        with open(path) as f: return yaml.safe_load(f)
+    except:
+        return {}
 
 def merge_cli_over_config(cfg:dict, args)->Cfg:
     # very light merging; you can expand validations
