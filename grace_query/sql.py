@@ -1,13 +1,19 @@
 # grace_query/sql.py
 import os
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 
 required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+tbl_envname = "TABLE_NAME"
 
 def _get_allowed_columns(engine) -> list:
-    with engine.connect() as conn:
-        allowed = list(pd.read_sql_query(text(f"""SELECT * FROM {os.getenv("TABLE_NAME")}"""), conn).columns)
+
+    try:
+        inspector = inspect(engine)
+        allowed = [col["name"] for col in inspector.get_columns(os.getenv(tbl_envname))]
+    except:
+        with engine.connect() as conn:
+            allowed = list(pd.read_sql_query(text(f"""SELECT * FROM {os.getenv("TABLE_NAME")}"""), conn).columns)
     return allowed
 
 def _columns_clause(requested, allowed):
