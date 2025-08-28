@@ -1,11 +1,19 @@
 # grace_query/sql.py
+import os
 import pandas as pd
 from sqlalchemy import create_engine, text
 
-def _columns_clause(requested_cols, allowed):
-    pick = [c for c in requested_cols if c in allowed]
+required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+
+def _get_allowed_columns(engine) -> list:
+    with engine.connect() as conn:
+        allowed = list(pd.read_sql_query(text(f"""SELECT * FROM {os.getenv("TABLE_NAME")}"""), conn).columns)
+    return allowed
+
+def _columns_clause(requested, allowed):
+    pick = [c for c in requested if c in allowed]
     if not pick: 
-        pick = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+        pick = required_columns
     return ", ".join(f'"{c}"' if c != "datetime" else "datetime" for c in pick)
 
 def run_query(db_url, table, start, end, space, columns):
@@ -13,9 +21,10 @@ def run_query(db_url, table, start, end, space, columns):
         raise ValueError("Database URL and table name are required (from flags, YAML or env).")
     engine = create_engine(db_url)
 
+    allowed_columns = _get_allowed_columns(engine)
+
     # Whitelist known columns to avoid injection via column names
-    allowed = {"id","datetime","latitude_A","longitude_A","postfit","up_combined","altitude_A","up_local","up_common","up_global"}
-    cols = _columns_clause(columns or [], allowed)
+    cols = _columns_clause(columns or [], allowed_columns)
 
     time_pred = []
     params = {}
