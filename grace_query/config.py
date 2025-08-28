@@ -5,6 +5,9 @@ import yaml
 from dotenv import load_dotenv
 import os               # Library for system operations, like reading environment variables
 
+
+required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+
 # Load environment variables
 load_dotenv()
 
@@ -87,6 +90,6 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
         srid=int(backend_dict.get("srid",4326))
     )
 
-    columns = (args.params.split(",") if args.params else cfg.get("columns")) or ["datetime","latitude_A","longitude_A","postfit","up_combined"]
+    columns = (args.columns.split(",") if args.columns else cfg.get("columns")) or required_columns
     
     return Cfg(time=time, space=space, columns=columns, export=export, problematic=problematic, backend=backend)

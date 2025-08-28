@@ -18,7 +18,7 @@ def main():
     query_parser.add_argument("--polygon-str", type=str, help="Polygon coordinates as 'lon1 lat1,lon2 lat2,...,lonN latN'")
     query_parser.add_argument("--polygon-file")
     query_parser.add_argument("--polygon-crs", default="EPSG:4326")
-    query_parser.add_argument("--params")
+    query_parser.add_argument("--columns")
     query_parser.add_argument("--out-format", type=str, default="netcdf", choices=["netcdf","csv","parquet"], help="Output format (csv or netcdf)")
     query_parser.add_argument("--out-path")
     query_parser.add_argument("--problematic-report")
