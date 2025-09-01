@@ -137,21 +137,23 @@ poetry run grace query \
   --table  $TABLE_NAME
 ```
 
-> x = lon
-> y = lat
-> YYYY = Year
-> MM = Month
-> DD = Day
-> HH = Hours
-> MM = Minutes
-> SS = Seconds
+> x = lon; 
+> y = lat; 
+> YYYY = Year; 
+> MM = Month; 
+> DD = Day; 
+> HH = Hours; 
+> MM = Minutes;
+> SS = Seconds'; 
 
-> Default arguments:
-> --polygon-crs "EPSG:4326" -> For simplicity, supply EPSG:4326 geometries.
-> --out-format netcdf -> csv and parquet exporting also supported
-> --strict-cf False -> netcdf exporting specific, related to "minimal CF assertions — extend as needed"
-> --db-url $DATABASE_URL
-> --table $TABLE_NAME
+```
+Default arguments:
+ --polygon-crs "EPSG:4326" -> For simplicity, supply EPSG:4326 geometries.
+ --out-format netcdf -> csv and parquet exporting also supported
+ --strict-cf False -> netcdf exporting specific, related to "minimal CF assertions — extend as needed"
+ --db-url $DATABASE_URL
+ --table $TABLE_NAME
+```
 
 #### Examples
 
