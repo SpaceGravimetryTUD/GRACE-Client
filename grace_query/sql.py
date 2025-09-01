@@ -17,9 +17,12 @@ def _get_allowed_columns(engine) -> list:
     return allowed
 
 def _columns_clause(requested, allowed):
-    pick = [c for c in requested if c in allowed]
-    if not pick: 
-        pick = required_columns
+    pick = required_columns
+
+    for c in requested:
+        if c in allowed and c not in pick:
+            pick.append(c)
+            
     return ", ".join(f'"{c}"' if c != "datetime" else "datetime" for c in pick)
 
 def run_query(db_url, table, start, end, space, columns):
