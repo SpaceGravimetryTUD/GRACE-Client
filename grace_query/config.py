@@ -5,22 +5,28 @@ import yaml
 from dotenv import load_dotenv
 import os               # Library for system operations, like reading environment variables
 
+
+required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+
 # Load environment variables
 load_dotenv()
 
-def showenv():
-  f = open('.env','r')
-  env_list=list(filter(None,[ s.split('=')[0].split('#')[0] for s in f.read().split('\n')]))
-  f.close()
+def getenv_list() -> list:
+    f = open('.env','r')
+    env_list=list(filter(None,[ s.split('=')[0].split('#')[0] for s in f.read().split('\n')]))
+    f.close()
+    return env_list
+
+def showenv(env_list: list = getenv_list()):
   print('Loaded the following env vars from .env:')
   for f in env_list:
       print(f'{f} = {os.getenv(f)}')
 
-def getenv(name: str) -> str:
-  value = os.getenv(name)
-  if not value:
+def getenv(envname: str) -> str:
+  envvar = os.getenv(envname)
+  if not envvar:
       raise EnvironmentError("{name} not found in environment variables.")
-  return value
+  return envvar
 
 @dataclass
 class TimeCfg:  start:str|None=None; end:str|None=None
@@ -38,7 +44,10 @@ class Cfg:
 
 def load_config(path:str|None)->dict:
     if not path: return {}
-    with open(path) as f: return yaml.safe_load(f) or {}
+    try:
+        with open(path) as f: return yaml.safe_load(f)
+    except:
+        return {}
 
 def merge_cli_over_config(cfg:dict, args)->Cfg:
     # very light merging; you can expand validations
@@ -81,6 +90,6 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
         srid=int(backend_dict.get("srid",4326))
     )
 
-    columns = (args.params.split(",") if args.params else cfg.get("columns")) or ["datetime","latitude_A","longitude_A","postfit","up_combined"]
+    columns = (args.columns.split(",") if args.columns else cfg.get("columns")) or required_columns
     
     return Cfg(time=time, space=space, columns=columns, export=export, problematic=problematic, backend=backend)

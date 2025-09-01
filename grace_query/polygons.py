@@ -1,12 +1,33 @@
 # grace_query/polygons.py
 from typing import Optional, Dict
+from collections import Counter
 from shapely.geometry import Polygon, shape
 from shapely import wkt as shapely_wkt
 from shapely.validation import explain_validity
 import json
+import warnings
+
+coords_max=5
+coords_countmax=2
 
 def _close_ring(coords):
-    return coords if coords[0] == coords[-1] else coords + [coords[0]]
+
+    coord_counts = [counter[1] for counter in Counter(coords).most_common()]
+
+    if max(coord_counts)==coords_countmax:
+        counter_counts = [counts[1] for counts in Counter(coord_counts).most_common() if counts[0]==coords_countmax][0]
+    elif max(coord_counts)>coords_countmax:
+        raise ValueError("--polygon_str does contain more than the two (expected) occurrences of the same set of x/y coordinates.")
+
+    if len(coords)<(coords_max-1) or len(coords)>coords_max or (len(coords)==coords_max and max(coord_counts) < coords_countmax) or (len(coords)==(coords_max-1) and max(coord_counts)>(coords_countmax-1)):
+        raise ValueError("--polygon_str does not contain 5 sets of x/y coordinates locations, of which the first and the last are the same.")
+    elif len(coords)==coords_max and coords[0] != coords[-1]: 
+        raise ValueError("--polygon_str first and last coordinates expected to be the same.")
+    elif len(coords)==(coords_max-1):
+        warnings.warn("--polygon_str contains for 4 unique sets x/y coordinates instead of 5 sets of x/y coordinates locations, of which the first and the last are the same. The code will automatically fill the 5th missing coordinate set with the first coordinate set given in the command line.", UserWarning)
+        coords = coords + [coords[0]]
+    
+    return coords
 
 def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs="EPSG:4326", target_srid=4326) -> Optional[Dict]:
     if not any([bbox, polygon_str, polygon_file]):

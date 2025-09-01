@@ -73,7 +73,7 @@ Create a `.env` file at the project root:
 TABLE_NAME=kbr_gravimetry_v2
 EXTERNAL_PORT=XXXX #Replace XXXX with available external port; in grace-cube.lr.tudelft.nl, port 3306 is open
 DATABASE_NAME=geospatial_db
-DATABASE_URL="postgresql://user:password@localhost:5432/${DATABASE_NAME}"
+DATABASE_URL="postgresql://user:password@localhost:${EXTERNAL_PORT}/${DATABASE_NAME}"
 DATA_PATH=/mnt/GRACEcube/Data/L1B_res/CSR_latlon_data/flat-data/v2/flat-data-2003.v2.pkl
 ```
 
@@ -115,21 +115,85 @@ poetry run <your-command>
 
 ---
 
-### Example Query Data
+### How to query Data
 
+The following example command line bellow shows how you can run your queries, with all the recognized arguments explicitly stated:
 
 ```bash
 poetry run grace query \
-  --start 2010-01 --end 2010-03 \
+  --start-time "${YYYY}-${MM}-${DD}T${HH}:${MM}:${SS}" \
+  --end-time "${YYYY}-${MM}-${DD}T${HH}:${MM}:${SS}" \
   --bbox xmin ymin xmax ymax \
-  --polygon "lon1 lat1,lon2 lat2,...,lonN latN" \
+  --polygon-str "xmin ymin, xmin ymax, xmax ymax, xmax ymin, xmin ymin" \
   --polygon-file path/to/area.geojson \
-  --params up_combined,postfit \
-  --format netcdf \
-  --out ./out/result.nc \
-  --config query.yaml \
+  --polygon-crs "EPSG:4326"\
+  --config path/to/query.yaml \
+  --columns cX,cY,... \
+  --out-format netcdf \
+  --out-path ./out/result.nc \
   --problematic-report ./out/problematic.json \
-  --strict-cf
+  --strict-cf False \
+  --db-url $DATABASE_URL \
+  --table  $TABLE_NAME
+```
+
+> x = lon; 
+> y = lat; 
+> YYYY = Year; 
+> MM = Month; 
+> DD = Day; 
+> HH = Hours; 
+> MM = Minutes;
+> SS = Seconds'; 
+
+```
+Default arguments:
+ --polygon-crs "EPSG:4326" -> For simplicity, supply EPSG:4326 geometries.
+ --out-format netcdf -> csv and parquet exporting also supported
+ --strict-cf False -> netcdf exporting specific, related to "minimal CF assertions — extend as needed"
+ --db-url $DATABASE_URL
+ --table $TABLE_NAME
+```
+
+#### Examples
+
+To query data for a spective time interval, e.g. covering the whole March 2017, you can run:
+
+```bash
+poetry run grace query --start-time="2012-03-01T00:00:00" --end-time="2012-04-01T00:00:00"
+```
+
+If you want to focus on a specific set of locations within the same time interval, you can do so be either using one of the following spatial parsing options:
+
+1. `--bbox`
+
+```bash
+poetry run grace query  --start-time "2012-03-01T00:00:00" --end-time "2012-04-01T00:00:00" --bbox 110 -7 200 5
+```
+
+2. `--polygon_str`
+
+```bash
+ poetry run grace query --start-time "2012-03-01T00:00:00" --end-time "2012-04-01T00:00:00"  --polygon-str '110 -7,200 -7,200 0
+5,110 05,110 -7'
+```
+
+3. `--polygon_file`
+
+```bash
+poetry run grace query  --start-time "2012-03-01T00:00:00" --end-time "2012-04-01T00:00:00"  --polygon-file path/to/area.geojson
+```
+
+By default the following columns will be selected in the querying: `id`, `datetime`, `latitude_A`, `longitude_A`, `postfit`, `up_combined`. If would like to include more table columns, you can do so by stating them after `--columns`:
+
+```bash
+poetry run grace query  --start-time "2012-03-01T00:00:00" --end-time "2012-04-01T00:00:00" --bbox 110 -7 200 5 --columns latitude_B,longitude_B
+```
+
+By default the output is exported as a netcdf formatted file with the pathname `./query_output.nc`. As alternatives, the current client code release allows you to export the data as csv or parquet using `-out-format`. The output's pathname can be edited using '--out-path'. For example:
+
+```bash
+poetry run grace query  --start-time "2012-03-01T00:00:00" --end-time "2012-04-01T00:00:00" --bbox 110 -7 200 5 --columns latitude_B,longitude_B --out-format "parquet" --out-path "./test_query.parquet"
 ```
 
 ---
