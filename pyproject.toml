@@ -24,6 +24,8 @@ xarray = "^2025.4.0"
 netcdf4 = "^1.7.2"
 PyYAML = "^6.0.2"
 tqdm = "^4.67.1"
+pyarrow = "^21.0.0"
+fastparquet = "^2024.11.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.3.0"
