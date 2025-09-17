@@ -35,7 +35,7 @@ def _close_ring(coords):
     
     return coords
 
-def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs="EPSG:4326", target_srid=4326) -> Optional[Dict]:
+def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs=constants.POLYGON_CRS, target_srid=constants.SRID) -> Optional[Dict]:
     if not any([bbox, polygon_str, polygon_file]):
         return None
 
@@ -64,7 +64,7 @@ def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs="EPS
         raise ValueError(f"Invalid polygon: {explain_validity(poly)}")
 
     # Assume polygon_crs == target_srid (to avoid heavy deps). If not, require reprojection done upstream.
-    if polygon_crs not in ("EPSG:4326",) or target_srid != 4326:
+    if polygon_crs not in (constants.POLYGON_CRS,) or target_srid != constants.SRID:
         raise ValueError("For simplicity, supply EPSG:4326 geometries. (Or add pyproj/geopandas to reproject.)")
 
     wkt = poly.wkt

@@ -1,5 +1,8 @@
 # grace_query/sql.py
 
+"""This module translates the querying configurations into SQL statement returns the data query."""
+
+
 # standard libraries
 import os
 
@@ -7,21 +10,22 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine, text, inspect
 
-required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
-tbl_envname = "TABLE_NAME"
+# local imports
+from grace_query import constants
+
 
 def _get_allowed_columns(engine) -> list:
 
     try:
         inspector = inspect(engine)
-        allowed = [col["name"] for col in inspector.get_columns(os.getenv(tbl_envname))]
+        allowed = [col["name"] for col in inspector.get_columns(os.getenv(constants.TABLE_ENVNAME))]
     except:
         with engine.connect() as conn:
             allowed = list(pd.read_sql_query(text(f"""SELECT * FROM {os.getenv("TABLE_NAME")}"""), conn).columns)
     return allowed
 
 def _columns_clause(requested, allowed):
-    pick = required_columns
+    pick = constants.TABLE_REQCOLS
 
     for c in requested:
         if c in allowed and c not in pick:

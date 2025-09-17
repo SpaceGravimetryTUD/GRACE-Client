@@ -11,7 +11,6 @@ import pandas as pd
 # local imports
 from grace_query import constants
 
-
 @dataclass
 class ProblematicConfig:
     cadence_seconds: int = constants.CADENCE_SECONDS

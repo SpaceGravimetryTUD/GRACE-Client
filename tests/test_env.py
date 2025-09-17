@@ -1,5 +1,8 @@
 # tests/test_env.py
 
+"""This test checks that environmental variables locally stored in ./.env and required for data querying are properly loaded."""
+
+
 # standard libraries
 import os
 

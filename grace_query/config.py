@@ -38,9 +38,9 @@ def getenv(envname: str) -> str:
 @dataclass
 class TimeCfg:  start:str|None=None; end:str|None=None
 @dataclass
-class SpaceCfg: bbox:list|None=None; polygon_str:str|None=None; polygon_file:str|None=None; polygon_crs:str="EPSG:4326"
+class SpaceCfg: bbox:list|None=None; polygon_str:str|None=None; polygon_file:str|None=None; polygon_crs:str=constants.POLYGON_CRS
 @dataclass
-class ExportCfg: format:str="netcdf"; out:str="./query_output.nc"; strict_cf:bool=False; options:dict=None
+class ExportCfg: format:str=constants.OUTPUT_DEFAULT; out:str="./query_output.nc"; strict_cf:bool=False; options:dict=None
 @dataclass
 class ProbleCfg: cadence_seconds:int=5; missing_threshold_pct:float=2.0; report_path:str|None=None
 @dataclass
@@ -66,15 +66,15 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
         bbox=[float(x) for x in args.bbox] if args.bbox else space_dict.get("bbox"),
         polygon_str=args.polygon_str or space_dict.get("polygon_str"),
         polygon_file=args.polygon_file or space_dict.get("polygon_file"),
-        polygon_crs=args.polygon_crs or space_dict.get("polygon_crs","EPSG:4326")
+        polygon_crs=args.polygon_crs or space_dict.get("polygon_crs",constants.POLYGON_CRS)
     )
 
     export_dict = cfg.get("export",{})
     export = ExportCfg(
-        format=(args.out_format or export_dict.get("format","netcdf")),
+        format=(args.out_format or export_dict.get("format",constants.OUTPUT_DEFAULT)),
         out=(args.out_path or export_dict.get("path","./query_output.nc")),
         strict_cf=bool(args.strict_cf or export_dict.get("strict_cf",False)),
-        options=export_dict.get("netcdf",{}) if (args.out_format or export_dict.get("format","netcdf"))=="netcdf" else {}
+        options=export_dict.get(constants.OUTPUT_DEFAULT,{}) if (args.out_format or export_dict.get("format",constants.OUTPUT_DEFAULT))==constants.OUTPUT_DEFAULT else {}
     )
     
     
@@ -84,8 +84,8 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
     
     if prob_dict or args.problematic_report:
         problematic = ProbleCfg(
-            cadence_seconds=int((prob_dict or {}).get("cadence_seconds",5)),
-            missing_threshold_pct=float((prob_dict or {}).get("missing_threshold_pct",2.0)),
+            cadence_seconds=int((prob_dict or {}).get("cadence_seconds",constants.CADENCE_SECONDS)),
+            missing_threshold_pct=float((prob_dict or {}).get("missing_threshold_pct",constants.MISSING_THRESHOLD_PCT)),
             report_path=args.problematic_report or (prob_dict or {}).get("report_path")
         )
         
@@ -94,7 +94,7 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
     backend = Backend(
         url=args.db_url or backend_dict.get("url"),
         table=args.table or backend_dict.get("table"),
-        srid=int(backend_dict.get("srid",4326))
+        srid=int(backend_dict.get("srid",constants.SRID))
     )
 
     columns = (args.columns.split(",") if args.columns else cfg.get("columns")) or constants.TABLE_REQCOLS
