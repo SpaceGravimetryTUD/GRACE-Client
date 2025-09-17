@@ -2,7 +2,6 @@
 
 """This module translates the querying configurations into SQL statement returns the data query."""
 
-
 # standard libraries
 import os
 
@@ -21,7 +20,7 @@ def _get_allowed_columns(engine) -> list:
         allowed = [col["name"] for col in inspector.get_columns(os.getenv(constants.TABLE_ENVNAME))]
     except:
         with engine.connect() as conn:
-            allowed = list(pd.read_sql_query(text(f"""SELECT * FROM {os.getenv("TABLE_NAME")}"""), conn).columns)
+            allowed = list(pd.read_sql_query(text(f"""SELECT * FROM {os.getenv(constants.TABLE_ENVNAME)}"""), conn).columns)
     return allowed
 
 def _columns_clause(requested, allowed):
@@ -31,7 +30,7 @@ def _columns_clause(requested, allowed):
         if c in allowed and c not in pick:
             pick.append(c)
             
-    return ", ".join(f'"{c}"' if c != "datetime" else "datetime" for c in pick)
+    return ", ".join(f'"{c}"' if c != constants.TIMECOL else constants.TIMECOL for c in pick)
 
 def run_query(db_url, table, start, end, space, columns):
     if not db_url or not table:
@@ -45,22 +44,24 @@ def run_query(db_url, table, start, end, space, columns):
 
     time_pred = []
     params = {}
-    if start: time_pred.append("datetime >= :start"); params["start"] = pd.to_datetime(start)
-    if end:   time_pred.append("datetime <  :end");   params["end"]   = pd.to_datetime(end)
+    if start: time_pred.append(str(constants.TIMECOL + " >= :start")); params["start"] = pd.to_datetime(start)
+    if end:   time_pred.append(str(constants.TIMECOL + " <  :end"));   params["end"]   = pd.to_datetime(end)
 
     space_pred = []
     if space and "wkt" in space:
         space_pred.append("""
           ST_Contains(
             ST_GeomFromText(:wkt, :srid),
-            ST_SetSRID(ST_MakePoint("longitude_A","latitude_A"), :srid)
+            ST_SetSRID(ST_MakePoint(:loncol, :latcol), :srid)
           )
         """)
+        params["loncol"] = constants.LONCOL
+        params["latcol"] = constants.LATCOL
         params["wkt"] = space["wkt"]
         params["srid"] = space["srid"]
 
     predicates = " AND ".join([*time_pred, *space_pred]) or "TRUE"
-    query = text(f'SELECT {cols} FROM "{table}" WHERE {predicates} ORDER BY datetime ASC')
+    query = text(f'SELECT {cols} FROM "{table}" WHERE {predicates} ORDER BY {constants.TIMECOL} ASC')
 
     with engine.connect() as conn:
         df = pd.read_sql_query(query, conn, params=params)

@@ -72,7 +72,7 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
     export_dict = cfg.get("export",{})
     export = ExportCfg(
         format=(args.out_format or export_dict.get("format",constants.OUTPUT_DEFAULT)),
-        out=(args.out_path or export_dict.get("path","./query_output.nc")),
+        out=(args.out_path or export_dict.get("path",str("./query_output." + constants.OUTPUT_EXT))),
         strict_cf=bool(args.strict_cf or export_dict.get("strict_cf",False)),
         options=export_dict.get(constants.OUTPUT_DEFAULT,{}) if (args.out_format or export_dict.get("format",constants.OUTPUT_DEFAULT))==constants.OUTPUT_DEFAULT else {}
     )

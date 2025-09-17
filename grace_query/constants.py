@@ -12,6 +12,8 @@ TABLE_ENVNAME="TABLE_NAME"
 DB_ENVNAME="DATABASE_URL"
 
 TIMECOL = "datetime"
+LONCOL = "longitude_A"
+LATCOL = "latitude_A"
 TABLE_REQCOLS = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
 
 BBBOX_NARGS = 4
@@ -25,3 +27,4 @@ CADENCE_SECONDS = 5
 MISSING_THRESHOLD_PCT = 2.0
 
 OUTPUT_DEFAULT = "netcdf"
+OUTPUT_EXT = "nc"
