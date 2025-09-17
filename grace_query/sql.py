@@ -1,5 +1,9 @@
 # grace_query/sql.py
+
+# standard libraries
 import os
+
+# third party imports
 import pandas as pd
 from sqlalchemy import create_engine, text, inspect
 

@@ -1,10 +1,15 @@
 # grace_query/cli.py
-import argparse, os, sys
+
+# standard libraries
+import argparse
+
+# local imports
+from .export import select_writer  # returns a writer with .write(df, out_path)
 from .config import getenv, load_config, merge_cli_over_config
 from .polygons import parse_space  # returns dict with {'wkt': 'POLYGON(...)', 'srid': 4326} or None
-from .sql import run_query         # returns pandas DataFrame
 from .problematic import diagnose, ProblematicConfig
-from .export import select_writer  # returns a writer with .write(df, out_path)
+from .sql import run_query         # returns pandas DataFrame
+
 
 def main():
     parser = argparse.ArgumentParser(prog="grace query", description="GRACE CLI Query Tool")

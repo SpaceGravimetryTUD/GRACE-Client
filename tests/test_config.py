@@ -1,5 +1,9 @@
+# tests/test_config.py
+
+# standard libraries
 import warnings
 
+# local imports
 from grace_query.config import load_config
 
 cfg_tmp = {"time": {"start": None, "end": None},

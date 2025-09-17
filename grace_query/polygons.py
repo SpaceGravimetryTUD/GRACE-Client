@@ -1,29 +1,35 @@
 # grace_query/polygons.py
+
+"""This module handles space filtering configurations for data querying."""
+
+# standard libraries
 from typing import Optional, Dict
 from collections import Counter
-from shapely.geometry import Polygon, shape
-from shapely import wkt as shapely_wkt
-from shapely.validation import explain_validity
+
+# third party imports
 import json
+from shapely import wkt as shapely_wkt
+from shapely.geometry import Polygon, shape
+from shapely.validation import explain_validity
 import warnings
 
-coords_max=5
-coords_countmax=2
+# local imports
+from grace_query import constants
 
 def _close_ring(coords):
 
     coord_counts = [counter[1] for counter in Counter(coords).most_common()]
 
-    if max(coord_counts)==coords_countmax:
-        counter_counts = [counts[1] for counts in Counter(coord_counts).most_common() if counts[0]==coords_countmax][0]
-    elif max(coord_counts)>coords_countmax:
+    if max(coord_counts)==constants.MAX_REPCOORDS:
+        counter_counts = [counts[1] for counts in Counter(coord_counts).most_common() if counts[0]==constants.MAX_REPCOORDS][0]
+    elif max(coord_counts)>constants.MAX_REPCOORDS:
         raise ValueError("--polygon_str does contain more than the two (expected) occurrences of the same set of x/y coordinates.")
 
-    if len(coords)<(coords_max-1) or len(coords)>coords_max or (len(coords)==coords_max and max(coord_counts) < coords_countmax) or (len(coords)==(coords_max-1) and max(coord_counts)>(coords_countmax-1)):
+    if len(coords)<(constants.MAX_COORDS-1) or len(coords)>constants.MAX_COORDS or (len(coords)==constants.MAX_COORDS and max(coord_counts) < constants.MAX_REPCOORDS) or (len(coords)==(constants.MAX_COORDS-1) and max(coord_counts)>(constants.MAX_REPCOORDS-1)):
         raise ValueError("--polygon_str does not contain 5 sets of x/y coordinates locations, of which the first and the last are the same.")
-    elif len(coords)==coords_max and coords[0] != coords[-1]: 
+    elif len(coords)==constants.MAX_COORDS and coords[0] != coords[-1]: 
         raise ValueError("--polygon_str first and last coordinates expected to be the same.")
-    elif len(coords)==(coords_max-1):
+    elif len(coords)==(constants.MAX_COORDS-1):
         warnings.warn("--polygon_str contains for 4 unique sets x/y coordinates instead of 5 sets of x/y coordinates locations, of which the first and the last are the same. The code will automatically fill the 5th missing coordinate set with the first coordinate set given in the command line.", UserWarning)
         coords = coords + [coords[0]]
     

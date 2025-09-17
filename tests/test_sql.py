@@ -1,6 +1,13 @@
+# tests/test_sql.py
+
+# standard libraries
 import os
+
+# third party imports
 import pytest
 from sqlalchemy import create_engine, text, inspect
+
+# local imports
 from grace_query.sql import _get_allowed_columns
 
 db_envname = "DATABASE_URL"
