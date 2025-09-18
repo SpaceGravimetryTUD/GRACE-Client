@@ -10,6 +10,8 @@ from grace_query import constants
 from grace_query.config import load_config
 
 def test_config_yml():
+  """Test configuration settings coming from ./config.yml"""
+
   cfg = load_config(constants.CONFIG_PATH)
 
   if cfg == {}:

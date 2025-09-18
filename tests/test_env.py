@@ -16,6 +16,7 @@ from grace_query.config import getenv_list
 required_envnames = [constants.TABLE_ENVNAME, constants.DB_ENVNAME]
 
 def test_env():
+  """Test if environment variables can be loaded and if the necessary variables are available"""
 
   # Load environment variables
   load_dotenv()

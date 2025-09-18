@@ -14,6 +14,7 @@ from grace_query import constants
 
 
 def _get_allowed_columns(engine) -> list:
+    "Get collumn names from table stored in database and take those as the allowed collumn names to be covered by querying settings"
 
     try:
         inspector = inspect(engine)
@@ -24,6 +25,8 @@ def _get_allowed_columns(engine) -> list:
     return allowed
 
 def _columns_clause(requested, allowed):
+    "Make list of columns to be covered by data querying, in addition to the columns that have to be covered, listed in constants.TABLE_REQCOLS"
+
     pick = constants.TABLE_REQCOLS
 
     for c in requested:
@@ -33,6 +36,8 @@ def _columns_clause(requested, allowed):
     return ", ".join(f'"{c}"' if c != constants.TIMECOL else constants.TIMECOL for c in pick)
 
 def run_query(db_url, table, start, end, space, columns):
+    "Make a SQL statement covering all the querying settings and run query based on it."
+
     if not db_url or not table:
         raise ValueError("Database URL and table name are required (from flags, YAML or env).")
     engine = create_engine(db_url)
