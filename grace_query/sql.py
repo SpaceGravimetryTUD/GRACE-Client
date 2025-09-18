@@ -49,14 +49,12 @@ def run_query(db_url, table, start, end, space, columns):
 
     space_pred = []
     if space and "wkt" in space:
-        space_pred.append("""
+        space_pred.append(f"""
           ST_Contains(
             ST_GeomFromText(:wkt, :srid),
-            ST_SetSRID(ST_MakePoint(:loncol, :latcol), :srid)
+            ST_SetSRID(ST_MakePoint("{(str(constants.LONCOL))}", "{(str(constants.LATCOL))}"), :srid)
           )
         """)
-        params["loncol"] = constants.LONCOL
-        params["latcol"] = constants.LATCOL
         params["wkt"] = space["wkt"]
         params["srid"] = space["srid"]
 
