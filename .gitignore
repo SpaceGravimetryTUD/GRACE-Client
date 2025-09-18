@@ -92,4 +92,5 @@ rsyncf.list
 # Output
 *.nc
 *.csv
+*.parquet
 
