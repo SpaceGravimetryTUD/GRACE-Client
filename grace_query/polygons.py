@@ -17,6 +17,7 @@ import warnings
 from grace_query import constants
 
 def _close_ring(coords):
+    "Check polygon string corresponds to the expected format and fix if no coordinates are missing"
 
     coord_counts = [counter[1] for counter in Counter(coords).most_common()]
 
@@ -36,6 +37,8 @@ def _close_ring(coords):
     return coords
 
 def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs=constants.POLYGON_CRS, target_srid=constants.SRID) -> Optional[Dict]:
+    "Handle decision on spatial filtering procedure based on command line or configuration file, with EPSG:4326 as expected polygon CRS. BBbox, polygon string and polygon file as supported procedures."
+
     if not any([bbox, polygon_str, polygon_file]):
         return None
 
@@ -48,7 +51,7 @@ def parse_space(bbox=None, polygon_str=None, polygon_file=None, polygon_crs=cons
         coords = [(float(x), float(y)) for x, y in (pair.split() for pair in pairs)]
         poly = Polygon(_close_ring(coords))
 
-    else:  # polygon_file (GeoJSON or WKT in a .wkt)
+    else:  # polygon_file (GeoJSON or WKT in a .wkt) NEEDS TO BE TESTED
         if polygon_file.lower().endswith(".geojson") or polygon_file.lower().endswith(".json"):
             with open(polygon_file) as f:
                 gj = json.load(f)

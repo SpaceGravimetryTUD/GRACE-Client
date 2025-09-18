@@ -19,37 +19,45 @@ from grace_query import constants
 load_dotenv()
 
 def getenv_list() -> list:
+    """Identify environment variable stored in ./.env"""
+
     f = open('.env','r')
     env_list=list(filter(None,[ s.split('=')[0].split('#')[0] for s in f.read().split('\n')]))
     f.close()
     return env_list
 
 def showenv(env_list: list = getenv_list()):
+  """Show environment variables stored in ./.env"""
+
   print('Loaded the following env vars from .env:')
   for f in env_list:
       print(f'{f} = {os.getenv(f)}')
 
 def getenv(envname: str) -> str:
+  """Get environment variable value stored in ./.env. Error if empty value is found"""
+
   envvar = os.getenv(envname)
   if not envvar:
       raise EnvironmentError("{name} not found in environment variables.")
   return envvar
 
+"""Data classes for storing querying configuration setting info with default values."""
 @dataclass
 class TimeCfg:  start:str|None=None; end:str|None=None
 @dataclass
 class SpaceCfg: bbox:list|None=None; polygon_str:str|None=None; polygon_file:str|None=None; polygon_crs:str=constants.POLYGON_CRS
 @dataclass
-class ExportCfg: format:str=constants.OUTPUT_DEFAULT; out:str="./query_output.nc"; strict_cf:bool=False; options:dict=None
+class ExportCfg: format:str=constants.OUTPUT_DEFAULT; out:str=str("./query_output." + constants.OUTPUT_EXT); strict_cf:bool=False; options:dict=None
 @dataclass
-class ProbleCfg: cadence_seconds:int=5; missing_threshold_pct:float=2.0; report_path:str|None=None
+class ProbleCfg: cadence_seconds:int=constants.CADENCE_SECONDS; missing_threshold_pct:float=constants.MISSING_THRESHOLD_PCT; report_path:str|None=None
 @dataclass
-class Backend:   url:str|None=None; table:str|None=None; srid:int=4326
+class Backend:   url:str|None=None; table:str|None=None; srid:int=constants.SRID
 @dataclass
 class Cfg:
     time:TimeCfg; space:SpaceCfg; columns:list; export:ExportCfg; problematic:ProbleCfg|None; backend:Backend
 
 def load_config(path:str|None)->dict:
+    """Load data querying configuration stored in ./config.yml."""
     if not path: return {}
     try:
         with open(path) as f: return yaml.safe_load(f)
@@ -57,7 +65,8 @@ def load_config(path:str|None)->dict:
         return {}
 
 def merge_cli_over_config(cfg:dict, args)->Cfg:
-    # very light merging; you can expand validations
+    """converge configuration settings coming from command line (priority) and from ./config.yml"""
+
     time = TimeCfg(args.start_time or cfg.get("time",{}).get("start"),
                    args.end_time   or cfg.get("time",{}).get("end"))
     

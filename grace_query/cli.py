@@ -15,6 +15,9 @@ from .sql import run_query         # returns pandas DataFrame
 
 
 def main():
+
+    "Define data querying settings based on arguments defined in grace query command line, run query and export resulting data"
+
     parser = argparse.ArgumentParser(prog="grace query", description="GRACE CLI Query Tool")
     subparsers = parser.add_subparsers(dest="command")
 
@@ -76,7 +79,6 @@ def main():
     
     print(df)
 
-    # Export
     out_path = cfg.export.out
     writer = select_writer(cfg.export.format, cfg.export.options | {"strict_cf": cfg.export.strict_cf})
     writer.write(df, out_path)
