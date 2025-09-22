@@ -12,17 +12,17 @@ class NetCDFWriter:
     def write(self, df: pd.DataFrame, out_path: str) -> None:
         if df.empty: raise ValueError("Empty dataframe — nothing to write.")
 
-        # time as dimension; lat/lon as coords (point track)
-        t = pd.to_datetime(df[constants.TIMECOL])
-        ds = xr.Dataset(coords={"time": ("time", t.values)})
-        if constants.LATCOL in df: ds["lat"] = ("time", df[constants.LATCOL].to_numpy()); ds["lat"].attrs.update({"standard_name":"latitude","units":"degrees_north"})
-        if constants.LONCOL in df: ds["lon"] = ("time", df[constants.LONCOL].to_numpy()); ds["lon"].attrs.update({"standard_name":"longitude","units":"degrees_east"})
+        # datetime as dimension; lat/lon as coords (point track)
+        t = pd.to_datetime(df[constants.DATETIMECOL])
+        ds = xr.Dataset(coords={"datetime": ("datetime", t.values)})
+        if constants.LATCOL in df: ds["lat"] = ("datetime", df[constants.LATCOL].to_numpy()); ds["lat"].attrs.update({"standard_name":"latitude","units":"degrees_north"})
+        if constants.LONCOL in df: ds["lon"] = ("datetime", df[constants.LONCOL].to_numpy()); ds["lon"].attrs.update({"standard_name":"longitude","units":"degrees_east"})
 
         for col in df.columns:
-            if col in (constants.TIMECOL,constants.LATCOL,constants.LONCOL): continue
-            ds[col] = ("time", df[col].to_numpy())
+            if col in (constants.DATETIMECOL,constants.LATCOL,constants.LONCOL): continue
+            ds[col] = ("datetime", df[col].to_numpy())
 
-        ds["time"].attrs.update({"standard_name":"time","axis":"T"})
+        ds["datetime"].attrs.update({"standard_name":"datetime","axis":"T"})
         ds.attrs.update({
             "Conventions": "CF-1.8",
             "title": "GRACE query output",
@@ -37,7 +37,7 @@ class NetCDFWriter:
 
         if self.opts.get("strict_cf", False):
             # Minimal CF assertions — extend as needed
-            for req in ("time","lat","lon"):
+            for req in ("datetime","lat","lon"):
                 if req not in ds:
                     raise ValueError(f"CF strict mode: missing coordinate '{req}'")
 

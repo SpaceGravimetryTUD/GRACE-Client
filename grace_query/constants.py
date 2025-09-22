@@ -14,7 +14,7 @@ TABLE_ENVNAME="TABLE_NAME"
 DB_ENVNAME="DATABASE_URL"
 
 # SQL Table columns related constants
-TIMECOL = "datetime"
+DATETIMECOL = "datetime"
 LONCOL = "longitude_A"
 LATCOL = "latitude_A"
 TABLE_REQCOLS = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]

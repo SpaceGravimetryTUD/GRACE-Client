@@ -33,7 +33,7 @@ def _columns_clause(requested, allowed):
         if c in allowed and c not in pick:
             pick.append(c)
             
-    return ", ".join(f'"{c}"' if c != constants.TIMECOL else constants.TIMECOL for c in pick)
+    return ", ".join(f'"{c}"' if c != constants.DATETIMECOL else constants.DATETIMECOL for c in pick)
 
 def run_query(db_url, table, start, end, space, columns):
     "Make a SQL statement covering all the querying settings and run query based on it."
@@ -49,8 +49,8 @@ def run_query(db_url, table, start, end, space, columns):
 
     time_pred = []
     params = {}
-    if start: time_pred.append(str(constants.TIMECOL + " >= :start")); params["start"] = pd.to_datetime(start)
-    if end:   time_pred.append(str(constants.TIMECOL + " <  :end"));   params["end"]   = pd.to_datetime(end)
+    if start: time_pred.append(str(constants.DATETIMECOL + " >= :start")); params["start"] = pd.to_datetime(start)
+    if end:   time_pred.append(str(constants.DATETIMECOL + " <  :end"));   params["end"]   = pd.to_datetime(end)
 
     space_pred = []
     if space and "wkt" in space:
@@ -64,7 +64,7 @@ def run_query(db_url, table, start, end, space, columns):
         params["srid"] = space["srid"]
 
     predicates = " AND ".join([*time_pred, *space_pred]) or "TRUE"
-    query = text(f'SELECT {cols} FROM "{table}" WHERE {predicates} ORDER BY {constants.TIMECOL} ASC')
+    query = text(f'SELECT {cols} FROM "{table}" WHERE {predicates} ORDER BY {constants.DATETIMECOL} ASC')
 
     with engine.connect() as conn:
         df = pd.read_sql_query(query, conn, params=params)

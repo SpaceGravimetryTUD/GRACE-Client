@@ -60,7 +60,7 @@ def main():
     
     # Problematic months (optional)
     if cfg.problematic:
-        rep = diagnose(df, time_col=constants.TIMECOL, cfg=ProblematicConfig(
+        rep = diagnose(df, time_col=constants.DATETIMECOL, cfg=ProblematicConfig(
             cadence_seconds=cfg.problematic.cadence_seconds,
             missing_threshold_pct=cfg.problematic.missing_threshold_pct
         ))
