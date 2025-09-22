@@ -1,22 +1,35 @@
+# tests/test_sql.py
+
+"""This test checks that environment variables can identify the database and respective data table, and that the table column names match those expected by the code client"""
+
+
+# standard libraries
 import os
+
+# third party imports
 import pytest
 from sqlalchemy import create_engine, text, inspect
+
+# local imports
+from grace_query import constants
 from grace_query.sql import _get_allowed_columns
 
-db_envname = "DATABASE_URL"
-tbl_envname = "TABLE_NAME"
-required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
-
 def engine():
-    assert create_engine(os.getenv(db_envname)), "No database  found with the following URL: " + str(os.getenv(db_envname))
-    return create_engine(os.getenv(db_envname))
+    """Test if database can be found based on respective environment variable"""
+
+    assert create_engine(os.getenv(constants.DB_ENVNAME)), "No database found with the following URL: " + str(os.getenv(constants.DB_ENVNAME))
+    return create_engine(os.getenv(constants.DB_ENVNAME))
 
 def test_table_exists(engine=engine()):
+    """Test if table can be found in database based on respective environment variable"""
+
     inspector = inspect(engine)
     tables = inspector.get_table_names()
-    assert os.getenv(tbl_envname) in tables, "No table found in the database with the following name: " + str(os.getenv(tbl_envname))
+    assert os.getenv(constants.TABLE_ENVNAME) in tables, "No table found in the database with the following name: " + str(os.getenv(constants.TABLE_ENVNAME))
 
 def test_required_columns(engine=engine()):
+    """Test if SQL table contain the necessary collumns"""
+
     allowed_columns = _get_allowed_columns(engine)
-    for col in required_columns:
+    for col in constants.TABLE_REQCOLS:
         assert col in allowed_columns, "The following requested column could not be found back in the database table: " + col

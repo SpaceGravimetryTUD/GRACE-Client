@@ -1,14 +1,26 @@
 # grace_query/problematic.py
-import pandas as pd
+
+"""This module handles proper detection of problematic months covered by data querying."""
+
+# standard libraries
 from dataclasses import dataclass
 
+# third party imports
+import pandas as pd
+
+# local imports
+from grace_query import constants
+
+"""Data classes for storing querying configuration settings on problematic month diagnosis with default values."""
 @dataclass
 class ProblematicConfig:
-    cadence_seconds: int = 5
-    missing_threshold_pct: float = 2.0
+    cadence_seconds: int = constants.CADENCE_SECONDS
+    missing_threshold_pct: float = constants.MISSING_THRESHOLD_PCT
     report_path: str | None = None
 
 def diagnose(df: pd.DataFrame, time_col: str, cfg: ProblematicConfig) -> pd.DataFrame:
+    """Conduct diagnosis on problematic months where timestamps from following month are required to complete a month wide time window"""
+
     s = pd.to_datetime(df[time_col]).sort_values()
     months = s.dt.to_period("M")
     out = []

@@ -1,12 +1,22 @@
+# tests/test_env.py
+
+"""This test checks that environmental variables locally stored in ./.env and required for data querying are properly loaded."""
+
+
+# standard libraries
 import os
 
+# third party imports
 from dotenv import load_dotenv
 
+# local imports
+from grace_query import constants
 from grace_query.config import getenv_list
 
-required_envnames = ["TABLE_NAME", "DATABASE_URL"]
+required_envnames = [constants.TABLE_ENVNAME, constants.DB_ENVNAME]
 
 def test_env():
+  """Test if environment variables can be loaded and if the necessary variables are available"""
 
   # Load environment variables
   load_dotenv()
