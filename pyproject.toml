@@ -1,9 +1,29 @@
 [tool.poetry]
 name = "grace_query"
-version = "0.1.0"
-description = "CLI Query Tool for Time and Space"
-authors = ["Joao Guimaraes <j.guimaraes@tudelft.nl>", "Jose Urra <j.c.urrallanusa@tudelft.nl>", "Selin Kubilay <d.s.kubilay@tudelft.nl>"]
+version = "1.0.0"
+description = "CLI Query Tool for GRACE satellite data time and space filtering with flexible labeling support"
+authors = [
+    "Jose Carlos Urra Llanusa <j.c.urrallanusa@tudelft.nl>",
+    "Joao De Teixeira da Encarnacao <j.d.teixeiradaencarnacao@tudelft.nl>",
+    "Selin Kubilay <d.s.kubilay@tudelft.nl>",
+    "João Guimarães <j.guimaraes@tudelft.nl>",
+    "Miguel Cuadrat-Grzybowski <m.cuadrat-grzybowski@tudelft.nl>"
+]
 license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/SpaceGravimetryTUD"
+repository = "https://github.com/SpaceGravimetryTUD/GRACE-Client"
+keywords = ["grace", "satellite", "gravity", "cli", "query", "geospatial", "filtering"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
 
 [tool.poetry.scripts]
 grace = "grace_query.cli:main"
