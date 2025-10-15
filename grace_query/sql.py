@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from sqlalchemy import create_engine, text, inspect
 
-required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined","label","source"]
 tbl_envname = "TABLE_NAME"
 
 def _get_allowed_columns(engine) -> list:
@@ -25,7 +25,7 @@ def _columns_clause(requested, allowed):
             
     return ", ".join(f'"{c}"' if c != "datetime" else "datetime" for c in pick)
 
-def run_query(db_url, table, start, end, space, columns):
+def run_query(db_url, table, start, end, space, columns, labels=None):
     if not db_url or not table:
         raise ValueError("Database URL and table name are required (from flags, YAML or env).")
     engine = create_engine(db_url)
@@ -51,7 +51,25 @@ def run_query(db_url, table, start, end, space, columns):
         params["wkt"] = space["wkt"]
         params["srid"] = space["srid"]
 
-    predicates = " AND ".join([*time_pred, *space_pred]) or "TRUE"
+    # NEW: Label filtering predicates
+    label_pred = []
+    if labels:
+        if labels.label_filter:
+            # Support comma-separated list of labels
+            label_list = [l.strip() for l in labels.label_filter.split(",")]
+            if len(label_list) == 1:
+                label_pred.append("label = :label_filter")
+                params["label_filter"] = label_list[0]
+            else:
+                label_pred.append("label = ANY(:label_list)")
+                params["label_list"] = label_list
+        
+        if labels.source_filter != "all":
+            if labels.source_filter in ("original", "borrowed"):
+                label_pred.append("source = :source_filter")
+                params["source_filter"] = labels.source_filter
+
+    predicates = " AND ".join([*time_pred, *space_pred, *label_pred]) or "TRUE"
     query = text(f'SELECT {cols} FROM "{table}" WHERE {predicates} ORDER BY datetime ASC')
 
     with engine.connect() as conn:

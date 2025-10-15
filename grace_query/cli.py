@@ -19,6 +19,8 @@ def main():
     query_parser.add_argument("--polygon-crs", default="EPSG:4326")
     query_parser.add_argument("--config")
     query_parser.add_argument("--columns")
+    query_parser.add_argument("--label-filter", type=str, help="Filter by label (e.g. 'RL06_12-03' or comma-separated list)")
+    query_parser.add_argument("--source-filter", type=str, choices=["original", "borrowed", "all"], default="all", help="Filter by data source")
     query_parser.add_argument("--out-format", type=str, default="netcdf", choices=["netcdf","csv","parquet"], help="Output format (csv or netcdf)")
     query_parser.add_argument("--out-path")
     query_parser.add_argument("--problematic-report")
@@ -43,7 +45,7 @@ def main():
         db_url=cfg.backend.url or getenv("DATABASE_URL"),
         table=cfg.backend.table or getenv("TABLE_NAME"),
         start=cfg.time.start, end=cfg.time.end,
-        space=space, columns=cfg.columns
+        space=space, columns=cfg.columns, labels=cfg.labels
     )
 
     

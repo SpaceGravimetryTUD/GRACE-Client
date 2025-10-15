@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os               # Library for system operations, like reading environment variables
 
 
-required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined"]
+required_columns = ["id","datetime","latitude_A","longitude_A","postfit","up_combined","label","source"]
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +32,8 @@ def getenv(envname: str) -> str:
 class TimeCfg:  start:str|None=None; end:str|None=None
 @dataclass
 class SpaceCfg: bbox:list|None=None; polygon_str:str|None=None; polygon_file:str|None=None; polygon_crs:str="EPSG:4326"
+@dataclass  
+class LabelCfg: label_filter:str|None=None; source_filter:str="all"  # NEW: flexible labeling filters
 @dataclass
 class ExportCfg: format:str="netcdf"; out:str="./query_output.nc"; strict_cf:bool=False; options:dict=None
 @dataclass
@@ -40,7 +42,7 @@ class ProbleCfg: cadence_seconds:int=5; missing_threshold_pct:float=2.0; report_
 class Backend:   url:str|None=None; table:str|None=None; srid:int=4326
 @dataclass
 class Cfg:
-    time:TimeCfg; space:SpaceCfg; columns:list; export:ExportCfg; problematic:ProbleCfg|None; backend:Backend
+    time:TimeCfg; space:SpaceCfg; labels:LabelCfg; columns:list; export:ExportCfg; problematic:ProbleCfg|None; backend:Backend
 
 def load_config(path:str|None)->dict:
     if not path: return {}
@@ -60,6 +62,13 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
         polygon_str=args.polygon_str or space_dict.get("polygon_str"),
         polygon_file=args.polygon_file or space_dict.get("polygon_file"),
         polygon_crs=args.polygon_crs or space_dict.get("polygon_crs","EPSG:4326")
+    )
+
+    # NEW: Label filtering configuration  
+    labels_dict = cfg.get("labels",{})
+    labels = LabelCfg(
+        label_filter=args.label_filter or labels_dict.get("label_filter"),
+        source_filter=args.source_filter or labels_dict.get("source_filter","all")
     )
 
     export_dict = cfg.get("export",{})
@@ -91,5 +100,5 @@ def merge_cli_over_config(cfg:dict, args)->Cfg:
     )
 
     columns = (args.columns.split(",") if args.columns else cfg.get("columns")) or required_columns
-    
-    return Cfg(time=time, space=space, columns=columns, export=export, problematic=problematic, backend=backend)
+
+    return Cfg(time=time, space=space, labels=labels, columns=columns, export=export, problematic=problematic, backend=backend)
