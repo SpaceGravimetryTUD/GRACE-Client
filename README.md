@@ -1,6 +1,16 @@
 # GRACE CLI Query Tool
 
-This repository hosts the code allowing to perform SQL queries using a Python-based command line interface (CLI) on [the database designed to host ​spatiotemporal gravity data](https://github.com/SpaceGravimetryTUD/GRACE-Orbit-Residuals-db/tree/develop) recorded by the [GRACE (twin) satellites](https://grace.jpl.nasa.gov/mission/grace/). 
+This repository hosts the code allowing to perform SQL queries using a Python-based command line interface (CLI) on [the database designed to host ​spatiotemporal gravity data](https://github.com/SpaceGravimetryTUD/GRA## 👥 Contributors
+
+This project was developed by the Space Gravimetry research group at Delft University of Technology:
+
+- **Jose Carlos Urra Llanusa** - Research Software Engineer
+- **Joao De Teixeira da Encarnacao** - Researcher 
+- **Selin Kubilay** - Research Data Engineer
+- **João Guimarães** - Research Data Engineer
+- **Miguel Cuadrat-Grzybowski** - Researcher
+
+## 📜 Licensing & Waiveresiduals-db/tree/develop) recorded by the [GRACE (twin) satellites](https://grace.jpl.nasa.gov/mission/grace/).
 
 ---
 
@@ -240,7 +250,16 @@ poetry run pytest
 
 ---
 
-## 📜 Licensing & Waiver
+## � Contributors
+
+This project was developed by the Space Gravimetry research group at Delft University of Technology:
+
+- **Jose Carlos Urra Llanusa** - Research Software Engineer
+- **Joao De Teixeira da Encarnacao** - Research Scientist  
+- **Selin Kubilay** - Research Engineer
+- **João Guimarães** - Software Developer
+
+## �📜 Licensing & Waiver
 
 Licensed under the MIT License.
 
